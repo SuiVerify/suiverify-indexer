@@ -1,0 +1,17 @@
+/target
+.env
+
+# Added for production
+*.log
+/target/**
+**/*.rs.bk
+.idea/
+.vscode/
+.DS_Store
+__pycache__/
+*.pyc
+node_modules/
+dist/
+build/
+.env.*
+!.env.example
