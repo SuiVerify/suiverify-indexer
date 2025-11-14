@@ -9,7 +9,7 @@ use crate::models::StoredTransactionDigest;
 use crate::schema::transaction_digests::dsl::*;
 use diesel_async::RunQueryDsl;
 use sui_indexer_alt_framework::{
-    postgres::{Connection, Db},
+    postgres::Db,
     pipeline::sequential::Handler,
     store::Store,
 };
@@ -22,7 +22,7 @@ impl Processor for TransactionDigestHandler {
 
     type Value = StoredTransactionDigest;
 
-    async fn process(&self, checkpoint: &Arc<Checkpoint>) -> Result<Vec<Self::Value>> {
+    async fn process(&self, checkpoint: &Arc<Checkpoint>) -> Result<Vec<StoredTransactionDigest>> {
         let checkpoint_seq = checkpoint.summary.sequence_number as i64;
 
         let digests = checkpoint.transactions.iter().map(|tx| {
@@ -39,16 +39,16 @@ impl Processor for TransactionDigestHandler {
 #[async_trait::async_trait]
 impl Handler for TransactionDigestHandler {
     type Store = Db;
-    type Batch = Vec<Self::Value>;
+    type Batch = Vec<StoredTransactionDigest>;
 
-    fn batch(&self, batch: &mut Self::Batch, values: std::vec::IntoIter<Self::Value>) {
+    fn batch(&self, batch: &mut Vec<StoredTransactionDigest>, values: std::vec::IntoIter<StoredTransactionDigest>) {
         batch.extend(values);
     }
 
     async fn commit<'a>(
         &self,
-        batch: &Self::Batch,
-        conn: &mut <Self::Store as Store>::Connection<'a>,
+        batch: &Vec<StoredTransactionDigest>,
+        conn: &mut <Db as Store>::Connection<'a>,
     ) -> Result<usize> {
         let inserted = diesel::insert_into(transaction_digests)
             .values(batch)
