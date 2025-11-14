@@ -75,7 +75,7 @@ async fn main() -> Result<()> {
     
     if log_config.should_log_detailed() {
         info!("✅ Registered DIDClaimedEventHandler pipeline");
-        info!("🎯 Monitoring events for package: 0x6ec40d30e636afb906e621748ee60a9b72bc59a39325adda43deadd28dc89e09");
+        info!("🎯 Monitoring events for package: 0xd9f5cd6845d838653bac950697ab33009db0a7f886b201dbda9ba132c3dd495");
     }
     
     // Start the indexer

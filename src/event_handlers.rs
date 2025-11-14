@@ -17,8 +17,8 @@ use sui_indexer_alt_framework::{
     store::Store,
 };
 
-// Your package ID from the transaction
-const SUIVERIFY_PACKAGE_ID: &str = "0x6ec40d30e636afb906e621748ee60a9b72bc59a39325adda43deadd28dc89e09";
+// Your package ID from the transaction (updated to match deployed contract - without leading zero)
+const SUIVERIFY_PACKAGE_ID: &str = "0xd9f5cd6845d838653bac950697ab33009db0a7f886b201dbda9ba132c3dd495";
 
 pub struct DIDClaimedEventHandler {
     log_config: LogConfig,
@@ -45,6 +45,11 @@ impl Processor for DIDClaimedEventHandler {
                    checkpoint_seq, checkpoint.transactions.len());
         }
         
+        // Log every 1000 checkpoints to show progress
+        if checkpoint_seq % 1000 == 0 {
+            println!("📊 Processed checkpoint: {}", checkpoint_seq);
+        }
+        
         let mut events = Vec::new();
 
         for (_tx_idx, tx) in checkpoint.transactions.iter().enumerate() {
@@ -57,7 +62,7 @@ impl Processor for DIDClaimedEventHandler {
                     // Check if this event is from our package and module
                     let event_type = event.type_.to_string();
                     
-                    // Format: PACKAGE_ID::MODULE::EVENT_NAME
+                    // Format: PACKAGE_ID::MODULE::EVENT_NAME (compiled module name)
                     let expected_type = format!("{}::did_registry::DIDClaimed", SUIVERIFY_PACKAGE_ID);
                     
                     if event_type == expected_type {

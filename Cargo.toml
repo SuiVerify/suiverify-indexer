@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-# Core framework dependencies - LOCAL PATH
+
 sui-indexer-alt-framework = { path = "../sui/crates/sui-indexer-alt-framework" }
 
 # Sui types
