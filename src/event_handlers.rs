@@ -47,7 +47,7 @@ impl Processor for DIDClaimedEventHandler {
         
         // Log every 1000 checkpoints to show progress
         if checkpoint_seq % 1000 == 0 {
-            println!("📊 Processed checkpoint: {}", checkpoint_seq);
+            println!("Processed checkpoint: {}", checkpoint_seq);
         }
         
         let mut events = Vec::new();
@@ -67,7 +67,7 @@ impl Processor for DIDClaimedEventHandler {
                     
                     if event_type == expected_type {
                         if self.log_config.should_log_events() {
-                            info!("🎯 Found DIDClaimed event in tx: {} at index: {}", 
+                            info!("Found DIDClaimed event in tx: {} at index: {}", 
                                   &tx_digest[..8], event_idx);
                         }
                         
@@ -75,7 +75,7 @@ impl Processor for DIDClaimedEventHandler {
                         match bcs::from_bytes::<DIDClaimed>(&event.contents) {
                         Ok(did_claimed) => {
                             if self.log_config.should_log_events() {
-                                info!("📝 DIDClaimed Event Details:");
+                                info!("   DIDClaimed Event Details:");
                                 info!("   Registry ID: {}", did_claimed.registry_id);
                                 info!("   User Address: {}", did_claimed.user_address);
                                 info!("   DID Type: {}", did_claimed.did_type);
@@ -96,7 +96,7 @@ impl Processor for DIDClaimedEventHandler {
                         },
                         Err(e) => {
                             // Log but don't fail - might be a different event version
-                            warn!("⚠️  Failed to deserialize DIDClaimed event in tx {}: {}", 
+                            warn!("Failed to deserialize DIDClaimed event in tx {}: {}", 
                                   &tx_digest[..8], e);
                         }
                     }
@@ -106,7 +106,7 @@ impl Processor for DIDClaimedEventHandler {
         }
 
         if self.log_config.should_log_events() && !events.is_empty() {
-            info!("✅ Processed {} DIDClaimed events from checkpoint {}", 
+            info!("Processed {} DIDClaimed events from checkpoint {}", 
                   events.len(), checkpoint_seq);
         }
 
@@ -145,9 +145,9 @@ impl Handler for DIDClaimedEventHandler {
 
         if self.log_config.should_log_events() {
             if inserted > 0 {
-                info!("💾 Successfully inserted {} new DIDClaimed events", inserted);
+                info!("Successfully inserted {} new DIDClaimed events", inserted);
             } else {
-                debug!("💾 No new events inserted (duplicates skipped)");
+                debug!("No new events inserted (duplicates skipped)");
             }
         }
 

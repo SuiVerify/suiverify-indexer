@@ -36,8 +36,8 @@ async fn main() -> Result<()> {
     // Our logging configuration will control what gets logged
 
     if log_config.should_log_detailed() {
-        info!("🚀 Starting SuiVerify Indexer with detailed logging enabled");
-        info!("📊 Log configuration: {:?}", log_config);
+        info!("Starting SuiVerify Indexer with detailed logging enabled");
+        info!("Log configuration: {:?}", log_config);
     }
 
     // Database URL
@@ -64,7 +64,7 @@ async fn main() -> Result<()> {
     ).await?;
     
     if log_config.should_log_detailed() {
-        info!("✅ Registered TransactionDigestHandler pipeline");
+        info!("Registered TransactionDigestHandler pipeline");
     }
     
     // Register DIDClaimed event pipeline
@@ -74,8 +74,8 @@ async fn main() -> Result<()> {
     ).await?;
     
     if log_config.should_log_detailed() {
-        info!("✅ Registered DIDClaimedEventHandler pipeline");
-        info!("🎯 Monitoring events for package: 0xd9f5cd6845d838653bac950697ab33009db0a7f886b201dbda9ba132c3dd495");
+        info!("Registered DIDClaimedEventHandler pipeline");
+        info!("Monitoring events for package: 0xd9f5cd6845d838653bac950697ab33009db0a7f886b201dbda9ba132c3dd495");
     }
     
     // Start the indexer
