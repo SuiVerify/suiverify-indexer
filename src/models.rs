@@ -1,4 +1,5 @@
 use diesel::prelude::*;
+use serde::{Deserialize, Serialize};
 use sui_indexer_alt_framework::FieldCount;
 use crate::schema::{transaction_digests, did_claimed_events};
 
@@ -9,7 +10,7 @@ pub struct StoredTransactionDigest {
     pub checkpoint_sequence_number: i64,
 }
 
-#[derive(Insertable, Debug, Clone, FieldCount)]
+#[derive(Insertable, Debug, Clone, FieldCount, Serialize, Deserialize)]
 #[diesel(table_name = did_claimed_events)]
 pub struct StoredDIDClaimedEvent {
     pub registry_id: String,

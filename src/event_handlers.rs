@@ -5,6 +5,7 @@ use sui_indexer_alt_framework::{
 };
 use sui_types::full_checkpoint_content::Checkpoint;
 use tracing::{info, debug, warn};
+use redis::AsyncCommands;
 
 use crate::models::StoredDIDClaimedEvent;
 use crate::events::DIDClaimed;
@@ -136,6 +137,7 @@ impl Handler for DIDClaimedEventHandler {
             debug!("💾 Committing {} DIDClaimed events to database", batch.len());
         }
 
+        // 1. Write to PostgreSQL (permanent storage)
         let inserted = diesel::insert_into(did_claimed_events)
             .values(batch)
             .on_conflict((transaction_digest, event_index))
@@ -145,9 +147,45 @@ impl Handler for DIDClaimedEventHandler {
 
         if self.log_config.should_log_events() {
             if inserted > 0 {
-                info!("Successfully inserted {} new DIDClaimed events", inserted);
+                info!("✅ Successfully inserted {} new DIDClaimed events to PostgreSQL", inserted);
             } else {
                 debug!("No new events inserted (duplicates skipped)");
+            }
+        }
+
+        // 2. Publish to Redis Pub/Sub (real-time notifications)
+        // Note: If no subscribers, message is lost - this is acceptable
+        if !batch.is_empty() {
+            info!("🔍 Processing {} events for Redis publishing", batch.len());
+            
+            if let Ok(redis_url) = std::env::var("REDIS_URL") {
+                if let Ok(redis_client) = redis::Client::open(redis_url) {
+                    if let Ok(mut redis_con) = redis_client.get_multiplexed_async_connection().await {
+                        for event in batch {
+                            match serde_json::to_string(event) {
+                                Ok(event_json) => {
+                                    // PUBLISH to Redis Pub/Sub channel
+                                    let _: Result<(), redis::RedisError> = redis_con.publish("did_claimed", event_json).await;
+                                    
+                                    if self.log_config.should_log_events() {
+                                        info!("📤 Published event to Redis Pub/Sub channel 'did_claimed'");
+                                    }
+                                }
+                                Err(e) => {
+                                    warn!("⚠️  Failed to serialize event for Redis: {}", e);
+                                }
+                            }
+                        }
+                    } else {
+                        warn!("⚠️  Failed to connect to Redis - events not published (subscribers will miss this)");
+                    }
+                } else {
+                    warn!("⚠️  Invalid Redis URL - events not published");
+                }
+            } else {
+                if self.log_config.should_log_detailed() {
+                    debug!("No REDIS_URL configured - skipping Redis publish");
+                }
             }
         }
 
