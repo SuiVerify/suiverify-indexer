@@ -13,9 +13,14 @@ RUN apt-get update && apt-get install -y \
     build-essential \
     && rm -rf /var/lib/apt/lists/*
 
-# Set environment variables for bindgen to find libclang
-ENV LIBCLANG_PATH=/usr/lib/llvm-14/lib
-ENV LLVM_CONFIG_PATH=/usr/bin/llvm-config-14
+# Find and set libclang path
+RUN LIBCLANG_PATH=$(find /usr/lib -name "libclang.so*" | head -n 1 | xargs dirname) && \
+    echo "Found libclang at: $LIBCLANG_PATH" && \
+    echo "export LIBCLANG_PATH=$LIBCLANG_PATH" >> /etc/profile
+
+# Set environment variables for bindgen
+ENV LIBCLANG_PATH=/usr/lib/x86_64-linux-gnu
+ENV LD_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH
 
 # Set working directory
 WORKDIR /app
@@ -27,7 +32,7 @@ COPY Cargo.toml Cargo.lock ./
 COPY src ./src
 COPY migrations ./migrations
 
-# Build the application
+# Build the application with explicit LIBCLANG_PATH
 RUN cargo build --release
 
 # Runtime stage
