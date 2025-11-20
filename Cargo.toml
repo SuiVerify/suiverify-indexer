@@ -4,11 +4,11 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-# Sui indexer framework - using Git dependency for deployment
-sui-indexer-alt-framework = { git = "https://github.com/MystenLabs/sui.git", branch = "main" }
 
-# Sui types - using Git dependency for deployment
-sui-types = { git = "https://github.com/MystenLabs/sui.git", branch = "main" }
+sui-indexer-alt-framework = { path = "../sui/crates/sui-indexer-alt-framework" }
+
+# Sui types
+sui-types = { path = "../sui/crates/sui-types" }
 
 # Async runtime
 tokio = { version = "1.0", features = ["full"] }
