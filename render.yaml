@@ -1,0 +1,28 @@
+services:
+  - type: web
+    name: suiverify-indexer
+    runtime: rust
+    repo: https://github.com/SuiVerify/suiverify-indexer
+    branch: main
+    buildCommand: |
+      # Install system dependencies required for Sui compilation
+      apt-get update
+      apt-get install -y clang libclang-dev llvm-dev
+      # Build the Rust project
+      cargo build --release
+    startCommand: cargo run --release -- --remote-store-url https://checkpoints.testnet.sui.io --first-checkpoint 251834555
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: REDIS_URL
+        sync: false
+      - key: ENABLE_DETAILED_LOGS
+        value: true
+      - key: LOG_LEVEL
+        value: info
+      - key: LOG_EVENTS
+        value: true
+      - key: RUST_LOG
+        value: info
+      - key: LIBCLANG_PATH
+        value: /usr/lib/llvm-14/lib
