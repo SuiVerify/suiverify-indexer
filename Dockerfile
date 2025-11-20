@@ -5,6 +5,7 @@ FROM rust:1.91-slim-bookworm as builder
 RUN apt-get update && apt-get install -y \
     clang \
     libclang-dev \
+    llvm \
     llvm-dev \
     pkg-config \
     libssl-dev \
@@ -13,14 +14,21 @@ RUN apt-get update && apt-get install -y \
     build-essential \
     && rm -rf /var/lib/apt/lists/*
 
-# Find and set libclang path
-RUN LIBCLANG_PATH=$(find /usr/lib -name "libclang.so*" | head -n 1 | xargs dirname) && \
-    echo "Found libclang at: $LIBCLANG_PATH" && \
-    echo "export LIBCLANG_PATH=$LIBCLANG_PATH" >> /etc/profile
+# Verify libclang installation and set path
+RUN echo "Searching for libclang..." && \
+    find /usr -name "libclang.so*" 2>/dev/null && \
+    LIBCLANG_SO=$(find /usr/lib -name "libclang.so*" 2>/dev/null | grep -v "\.a$" | head -n 1) && \
+    if [ -z "$LIBCLANG_SO" ]; then \
+        echo "ERROR: libclang.so not found!" && exit 1; \
+    fi && \
+    LIBCLANG_DIR=$(dirname "$LIBCLANG_SO") && \
+    echo "Found libclang at: $LIBCLANG_DIR" && \
+    echo "LIBCLANG_PATH=$LIBCLANG_DIR" >> /etc/environment
 
-# Set environment variables for bindgen
+# Set environment variables
 ENV LIBCLANG_PATH=/usr/lib/x86_64-linux-gnu
 ENV LD_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH
+ENV BINDGEN_EXTRA_CLANG_ARGS="-I/usr/lib/llvm-14/lib/clang/14.0.6/include"
 
 # Set working directory
 WORKDIR /app
@@ -32,7 +40,7 @@ COPY Cargo.toml Cargo.lock ./
 COPY src ./src
 COPY migrations ./migrations
 
-# Build the application with explicit LIBCLANG_PATH
+# Build the application
 RUN cargo build --release
 
 # Runtime stage
