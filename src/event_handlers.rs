@@ -19,7 +19,7 @@ use sui_indexer_alt_framework::{
 };
 
 // Your package ID from the transaction (updated to match deployed contract - without leading zero)
-const SUIVERIFY_PACKAGE_ID: &str = "0xd9f5cd6845d838653bac950697ab33009db0a7f886b201dbda9ba132c3dd495";
+const SUIVERIFY_PACKAGE_ID: &str = "0x6ec40d30e636afb906e621748ee60a9b72bc59a39325adda43deadd28dc89e09";
 
 pub struct DIDClaimedEventHandler {
     log_config: LogConfig,
