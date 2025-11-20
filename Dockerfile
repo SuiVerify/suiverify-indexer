@@ -1,7 +1,8 @@
 # Use the official Rust image with all build tools
-FROM rust:1.91-slim-bookworm as builder
+FROM rust:1.91-bookworm as builder
 
 # Install system dependencies required for Sui compilation
+# Using full bookworm (not slim) to get all necessary libraries
 RUN apt-get update && apt-get install -y \
     clang \
     libclang-dev \
@@ -14,21 +15,9 @@ RUN apt-get update && apt-get install -y \
     build-essential \
     && rm -rf /var/lib/apt/lists/*
 
-# Verify libclang installation and set path
-RUN echo "Searching for libclang..." && \
-    find /usr -name "libclang.so*" 2>/dev/null && \
-    LIBCLANG_SO=$(find /usr/lib -name "libclang.so*" 2>/dev/null | grep -v "\.a$" | head -n 1) && \
-    if [ -z "$LIBCLANG_SO" ]; then \
-        echo "ERROR: libclang.so not found!" && exit 1; \
-    fi && \
-    LIBCLANG_DIR=$(dirname "$LIBCLANG_SO") && \
-    echo "Found libclang at: $LIBCLANG_DIR" && \
-    echo "LIBCLANG_PATH=$LIBCLANG_DIR" >> /etc/environment
-
-# Set environment variables
+# Set environment variables for bindgen
 ENV LIBCLANG_PATH=/usr/lib/x86_64-linux-gnu
 ENV LD_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH
-ENV BINDGEN_EXTRA_CLANG_ARGS="-I/usr/lib/llvm-14/lib/clang/14.0.6/include"
 
 # Set working directory
 WORKDIR /app
