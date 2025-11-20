@@ -73,8 +73,8 @@ sui-types = "1.37"
 ### Environment Variables for Render
 
 ```bash
-DATABASE_URL=postgresql://postgres:suiverifyindexer@db.orjhpozuqydjzqofdkpt.supabase.co:5432/postgres
-REDIS_URL=redis://default:4OMRhM0XvAVurI2RpVSDKvcvsxMI2s1r@redis-11134.crce182.ap-south-1-1.ec2.cloud.redislabs.com:11134
+DATABASE_URL=postgresql://postgres:YOUR_PASSWORD@YOUR_SUPABASE_HOST:5432/postgres
+REDIS_URL=redis://default:YOUR_REDIS_PASSWORD@YOUR_REDIS_HOST:YOUR_REDIS_PORT
 ENABLE_DETAILED_LOGS=true
 LOG_LEVEL=info
 LOG_EVENTS=true
