@@ -10,7 +10,12 @@ RUN apt-get update && apt-get install -y \
     libssl-dev \
     cmake \
     git \
+    build-essential \
     && rm -rf /var/lib/apt/lists/*
+
+# Set environment variables for bindgen to find libclang
+ENV LIBCLANG_PATH=/usr/lib/llvm-14/lib
+ENV LLVM_CONFIG_PATH=/usr/bin/llvm-config-14
 
 # Set working directory
 WORKDIR /app
