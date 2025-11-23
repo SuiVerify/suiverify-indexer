@@ -58,14 +58,14 @@ async fn main() -> Result<()> {
         .await?;
     
     // Register our custom sequential pipeline
-    cluster.sequential_pipeline(
-        TransactionDigestHandler,
-        SequentialConfig::default(),
-    ).await?;
+    // cluster.sequential_pipeline(
+    //     TransactionDigestHandler,
+    //     SequentialConfig::default(),
+    // ).await?;
     
-    if log_config.should_log_detailed() {
-        info!("Registered TransactionDigestHandler pipeline");
-    }
+    // if log_config.should_log_detailed() {
+    //     info!("Registered TransactionDigestHandler pipeline");
+    // }
     
     // Register DIDClaimed event pipeline
     cluster.sequential_pipeline(
